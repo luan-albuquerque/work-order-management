@@ -12,18 +12,18 @@ export class AuthService {
 
   async register(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const newUser = {
-      id: Date.now(),
-      username: dto.username,
+    const newUser: User = {
+      id: Date.now().toString(),
+      name: dto.name,
       password: hashedPassword,
-      role: 'user',
+      email: 'user',
     };
     this.users.push(newUser);
     return { message: 'Usuário registrado com sucesso', userId: newUser.id };
   }
 
   async validateUser(username: string, pass: string): Promise<any> {
-    const user = this.users.find((u) => u.username === username);
+    const user = this.users.find((u) => u.name === username);
 
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;

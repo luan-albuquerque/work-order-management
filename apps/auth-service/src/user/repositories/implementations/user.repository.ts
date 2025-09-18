@@ -6,7 +6,14 @@ import { CreateUserDto } from '../../dto/create-user.dto';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-  private users: User[] = [];
+  private users: User[] = [
+    {
+      email: 'testadmin',
+      id: '123',
+      name: 'teste de aminist',
+      password: 'sdjskdjsd',
+    },
+  ];
 
   create(dto: CreateUserDto): User {
     const user = new User(uuidv4(), dto.name, dto.email, dto.password);
