@@ -1,47 +1,42 @@
+# ======================
 # Etapa 1: Build
+# ======================
 FROM node:22.19-alpine AS builder
 
 WORKDIR /app
 
-# Copia o package.json e o package-lock.json da raiz (contexto pai)
+# Copia package.json da raiz
 COPY ../../package*.json ./
 COPY ../../nest-cli.json ./
 COPY ../../tsconfig*.json ./
 
-# Instala as dependências
+# Instala todas as dependências
 RUN npm install
 
-# Copia o código fonte
-COPY ../../apps/ ./apps/
-COPY ../../libs/ ./libs/
+# Copia apenas o microservice auth-service e as libs
+COPY ../../apps/auth-service ./apps/auth-service
+COPY ../../libs ./libs
 
-# Executa o build da aplicação (NestJS)
+# Faz o build apenas do auth-service
 RUN npm run build auth-service
 
-# Verifica o conteúdo da pasta dist
-RUN ls -lha /app/dist/apps/auth-service
-
+# ======================
 # Etapa 2: Runtime
+# ======================
 FROM node:22.19-alpine
 
 WORKDIR /app
 
-# Copia os artefatos da build para o container
+# Copia só o build do auth-service
 COPY --from=builder /app/dist/apps/auth-service ./dist
 
-# Copia o package.json da raiz
+# Copia package.json da raiz (para deps em runtime)
 COPY ../../package*.json ./
 
-# Instala as dependências de produção
+# Instala somente dependências de produção
 RUN npm install --omit=dev
 
-# Copia o arquivo .env se existir
-# COPY .env.dev ./
-
-# Verifica o conteúdo da pasta dist
-RUN ls -lha /app/dist
-
-# Expõe a porta padrão do NestJS
+# Expõe a porta
 EXPOSE 3000
 
 # Comando para rodar o microserviço

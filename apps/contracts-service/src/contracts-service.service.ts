@@ -6,3 +6,4 @@ export class ContractsServiceService {
     return 'Hello World Contracts Service!';
   }
 }
+  
